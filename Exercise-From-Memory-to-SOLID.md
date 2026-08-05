@@ -57,11 +57,13 @@ class User {
 4. When `main()` finishes, what can eventually happen to the `User` object?
    a. garbage collection should delete it
 5. In your own words, explain this line:
-   a. when you create an object from a class, since that is now a real thing, (not a blueprint as opposed to the class), it is something is stored in memory, and therefore now an integral part of running the program
+   
 
 ```text
 An object is structured memory.
 ```
+
+    a. when you create an object from a class, since that is now a real thing, (not a blueprint as opposed to the class), it is something is stored in memory, and therefore now an integral part of running the program
 
 ---
 
@@ -100,12 +102,19 @@ public class UserService {
 ## Questions
 
 1. What is this class responsible for?
+   a.
 2. How many different reasons could this class change?
+   a.
 3. Which method relates to validation?
+   a.
 4. Which method relates to persistence/database work?
+   a.
 5. Which method relates to email?
+   a.
 6. Which method relates to reporting?
+   a.
 7. Why could this class become difficult to maintain as the system grows?
+   a. 
 
 ---
 
@@ -206,9 +215,13 @@ public class SmsSender implements MessageSender {
 ## Questions
 
 1. What capability does `MessageSender` represent?
+   a. 
 2. Why is `MessageSender` more flexible than depending directly on `EmailSender`?
+   a. 
 3. Which SOLID principle does this help with?
+   a.
 4. How does this make the system easier to extend later?
+   a. 
 
 ---
 
@@ -256,10 +269,15 @@ public class UserRegistrationService {
 ## Questions
 
 1. What changed in the design?
+   a. 
 2. What concrete class did we remove from `UserRegistrationService`?
+   a. 
 3. What abstraction does it now depend on?
+   a. 
 4. Which principle is this?
+   a. 
 5. Why is this better?
+   a. 
 
 ---
 
@@ -284,10 +302,15 @@ class Penguin extends Bird {
 ## Questions
 
 1. Why does this design feel logical at first?
+   a. 
 2. Why does it become a problem in code?
+   a.
 3. What promise does `Bird` appear to make?
+   a.
 4. How does `Penguin` break that promise?
+   a.
 5. Which SOLID principle is involved here?
+   a. 
 
 ## Better Design
 
@@ -318,6 +341,8 @@ Explain this sentence:
 ```text
 Inheritance should preserve truth.
 ```
+### answer
+
 
 ---
 
@@ -349,14 +374,19 @@ public class UserRegistrationService {
 ## Questions
 
 1. Which objects does `UserRegistrationService` use?
+   a. 
 2. Is this inheritance or composition?
+   a. 
 3. Why is this better than putting all logic inside one class?
+   a.
 4. What does composition allow us to do?
+   a.
 5. Explain this sentence:
 
 ```text
 Composition lets us build bigger systems from smaller, clearer pieces.
 ```
+   a.
 
 ---
 
