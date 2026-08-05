@@ -49,14 +49,20 @@ class User {
 ## Questions
 
 1. Which parts of this code are likely stored on the **stack**?
+   1. the variable user, the arguments(args) and the main method?
 2. Which object is created on the **heap**?
+   1. User user
 3. What does the variable `user` refer to?
+   1. it refers to the User object that was made using new User()
 4. When `main()` finishes, what can eventually happen to the `User` object?
+   1. garbage collection should delete it
 5. In your own words, explain this line:
-
+    1. when you create an object from a class, since is is now a real thing, and it keeps its own data together, so its like an organises block of memory
 ```text
 An object is structured memory.
 ```
+
+    
 
 ---
 
@@ -95,12 +101,19 @@ public class UserService {
 ## Questions
 
 1. What is this class responsible for?
+   1. for creating a new user, and all the introductory processess associated with that
 2. How many different reasons could this class change?
-3. Which method relates to validation?
+   1. alot, every method could change depending on the context / requirements
+3. which method relates to validation?
+   1. validateEmail
 4. Which method relates to persistence/database work?
+   1. SaveUser
 5. Which method relates to email?
+   1. sendWelcomeEmail
 6. Which method relates to reporting?
+   1. generateUserReport
 7. Why could this class become difficult to maintain as the system grows?
+   1. becuase it does many things at once, as the program gets bigger, the class is will become a bottleneck to do all these things efficiently
 
 ---
 
@@ -123,22 +136,42 @@ Just create the class names and method names.
 ```java
 public class UserRegistrationService {
 
+    private EmailValidator validator = new EmailValidator();
+    private UserRepository repository = new UserRepository();
+    private WelcomeEmailSender emailSender = new WelcomeEmailSender();
+    private UserReportService reportService = new UserReportService();
+
+    public void registerUser(String email, String name) {
+        if (validator.validate(email)) {
+            repository.saveUser(email, name);
+            emailSender.sendWelcomeEmail(email);
+            reportService.generateReport(email);
+        }
+    }
 }
 
 public class EmailValidator {
-
+    public boolean validate(String email) {
+        return email.contains("@");
+    }
 }
 
 public class UserRepository {
-
+    public void saveUser(String email, String name) {
+        System.out.println("Saving user...");
+    }
 }
 
 public class WelcomeEmailSender {
-
+    public void sendWelcomeEmail(String email) {
+        System.out.println("Sending welcome email...");
+    }
 }
 
 public class UserReportService {
-
+    public void generateReport(String email) {
+        System.out.println("Generating report...");
+    }
 }
 ```
 
@@ -188,22 +221,30 @@ public interface MessageSender {
 
 ```java
 public class EmailSender implements MessageSender {
-
+    public void send(String to, String message) {
+        System.out.println("Email sent to " + to);
+    }
 }
 ```
 
 ```java
 public class SmsSender implements MessageSender {
-
+    public void send(String to, String message) {
+        System.out.println("SMS sent to " + to);
+    }
 }
 ```
 
 ## Questions
 
 1. What capability does `MessageSender` represent?
+   1. it allows for a message to be sent via any method, it only needs the message & message service
 2. Why is `MessageSender` more flexible than depending directly on `EmailSender`?
+   1. MessageSender allows for many message services or even email send methods to be used based on the requirements or how many attempts have been made to send an email 
 3. Which SOLID principle does this help with?
+   1. Open / Closed Principle
 4. How does this make the system easier to extend later?
+   1. it gives developers the options without it resulting in a fragile system that breaks with any new feature
 
 ---
 
@@ -239,11 +280,12 @@ public class UserRegistrationService {
     private final MessageSender messageSender;
 
     public UserRegistrationService(MessageSender messageSender) {
-        // your code here
+        this.messageSender = messageSender;
     }
 
     public void register(String email, String name) {
-        // your code here
+        System.out.println("Registering user");
+        messageSender.send(email, "Welcome, " + name);
     }
 }
 ```
@@ -251,10 +293,15 @@ public class UserRegistrationService {
 ## Questions
 
 1. What changed in the design?
+   1. we have made it alot more flexible 
 2. What concrete class did we remove from `UserRegistrationService`?
+   1. private EmailSender emailSender - new EmailSender();
 3. What abstraction does it now depend on?
+   1. the EmailSender interface
 4. Which principle is this?
+   1. DIP - Dependency Inversion Principle
 5. Why is this better?
+   1. because now the class doesn't care how the message is sent. it just knows it one of the services will send it, lessening the depedency
 
 ---
 
@@ -279,10 +326,15 @@ class Penguin extends Bird {
 ## Questions
 
 1. Why does this design feel logical at first?
+   1. because most birds can fly, so penguin and those alike are just edge cases
 2. Why does it become a problem in code?
+   1. because there is fragmentation in what the class bird can actually do
 3. What promise does `Bird` appear to make?
+   1. that all birds can fly
 4. How does `Penguin` break that promise?
+   1. it cant fly
 5. Which SOLID principle is involved here?
+   1. Liskov Substitution Principle
 
 ## Better Design
 
@@ -299,6 +351,9 @@ interface FlyingBird {
 
 class Eagle implements Bird, FlyingBird {
 
+    public void fly() {
+        System.out.println("Flying");
+    }
 }
 
 class Penguin implements Bird {
@@ -313,6 +368,8 @@ Explain this sentence:
 ```text
 Inheritance should preserve truth.
 ```
+### answer
+there should be a set of concrete capabilities that every descendant is able to do
 
 ---
 
@@ -344,10 +401,15 @@ public class UserRegistrationService {
 ## Questions
 
 1. Which objects does `UserRegistrationService` use?
+   1. EmailValidator, UserRepository, MessageSender
 2. Is this inheritance or composition?
+   1. Composition, because the class is built using other classes instead of extending one.
 3. Why is this better than putting all logic inside one class?
+   1. Because each class has one job to do, which makes it easier to change later
 4. What does composition allow us to do?
+   1. it allows us to put different classes together to create a bigger system
 5. Explain this sentence:
+   1. the smaller clearer pieces are the classes that do one job, and together all the smaller pieces produce a working solution.
 
 ```text
 Composition lets us build bigger systems from smaller, clearer pieces.
@@ -360,10 +422,15 @@ Composition lets us build bigger systems from smaller, clearer pieces.
 Answer these in your own words.
 
 1. What is the relationship between memory and objects?
+   1. objects are stored in memory when they are created / instantiated
 2. What is the relationship between objects and dependencies?
+   1. objects can use other objects to help them do their jobs, so they depend on eachother
 3. Why do dependencies make software harder to change?
+   1. if one class depends too much on another class, changing one might mean changing lots of other code too
 4. What does SOLID help us control?
+   1. it helps us organise our code and be able to handle change
 5. What does this sentence mean?
+6. 1.
 
 ```text
 Memory is where software lives.
@@ -389,10 +456,15 @@ Your system should include:
 Then answer:
 
 1. Which classes represent responsibilities?
+   1.
 2. Which interface represents a capability?
+   1. 
 3. Where are you using composition?
+   1. 
 4. Where are you applying DIP?
+   1. 
 5. How could you add `ApplePayPaymentProcessor` without changing `CheckoutService`?
+   1. 
 
 ---
 
