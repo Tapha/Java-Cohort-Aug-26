@@ -49,10 +49,15 @@ class User {
 ## Questions
 
 1. Which parts of this code are likely stored on the **stack**?
+   a. 
 2. Which object is created on the **heap**?
+   a.
 3. What does the variable `user` refer to?
+   a.
 4. When `main()` finishes, what can eventually happen to the `User` object?
+   a.
 5. In your own words, explain this line:
+   a.
 
 ```text
 An object is structured memory.
