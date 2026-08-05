@@ -49,14 +49,19 @@ class User {
 ## Questions
 
 1. Which parts of this code are likely stored on the **stack**?
+The main() method and the local variable user
 2. Which object is created on the **heap**?
+The new user object
 3. What does the variable `user` refer to?
+user refers to the user object on the heap
 4. When `main()` finishes, what can eventually happen to the `User` object?
+it can become eligible for garbage collection
 5. In your own words, explain this line:
 
 ```text
 An object is structured memory.
 ```
+an object is memory organised into named information such as email and name 
 
 ---
 
@@ -95,12 +100,19 @@ public class UserService {
 ## Questions
 
 1. What is this class responsible for?
+it validates,saves,emails and generates reports
 2. How many different reasons could this class change?
+it has at least 4 different reasons to change
 3. Which method relates to validation?
+Validation:validateEmail()
 4. Which method relates to persistence/database work?
+Database:saveUser()
 5. Which method relates to email?
+sendWelcomeEmail()
 6. Which method relates to reporting?
+generateUserReport()
 7. Why could this class become difficult to maintain as the system grows?
+It could become difficult to maintain because it has too many different jobs.
 
 ---
 
@@ -201,9 +213,13 @@ public class SmsSender implements MessageSender {
 ## Questions
 
 1. What capability does `MessageSender` represent?
+The ability to send a message
 2. Why is `MessageSender` more flexible than depending directly on `EmailSender`?
+Because email, SMS, WhatsApp and other senders can all implement it.
 3. Which SOLID principle does this help with?
+Mainly the Dependency Inversion Principle and the Open/Closed Principle.
 4. How does this make the system easier to extend later?
+We can add a new sender class without changing the registration service.
 
 ---
 
@@ -243,7 +259,8 @@ public class UserRegistrationService {
     }
 
     public void register(String email, String name) {
-        // your code here
+         System.out.println("Registering user");
+        messageSender.send(email, "Welcome, " + name);
     }
 }
 ```
@@ -251,10 +268,15 @@ public class UserRegistrationService {
 ## Questions
 
 1. What changed in the design?
+UserRegistrationService no longer creates its own sender. The sender is passed into the constructor.
 2. What concrete class did we remove from `UserRegistrationService`?
+EmailSender
 3. What abstraction does it now depend on?
+The MessageSender interface
 4. Which principle is this?
+DependancyInversionPrinciple
 5. Why is this better?
+Because the service can now use email, SMS, WhatsApp or a fake sender for testing without changing the UserRegistrationService code.
 
 ---
 
@@ -279,10 +301,15 @@ class Penguin extends Bird {
 ## Questions
 
 1. Why does this design feel logical at first?
+Because a penguin is a type of bird.
 2. Why does it become a problem in code?
+The Bird class says all birds can fly, but penguins cannot.
 3. What promise does `Bird` appear to make?
+That every bird has working fly() behaviour.
 4. How does `Penguin` break that promise?
+Its fly() method throws an error instead of flying.
 5. Which SOLID principle is involved here?
+The Liskov Substitution Principle.
 
 ## Better Design
 
@@ -298,7 +325,9 @@ interface FlyingBird {
 }
 
 class Eagle implements Bird, FlyingBird {
-
+    public void fly() {
+        System.out.println("Eagle flying");
+    }
 }
 
 class Penguin implements Bird {
@@ -313,7 +342,7 @@ Explain this sentence:
 ```text
 Inheritance should preserve truth.
 ```
-
+When a child class inherits from a parent, everything the parent promises should still be true for the child.
 ---
 
 # Part 7 — Composition: Building With Parts 🧩
@@ -344,15 +373,19 @@ public class UserRegistrationService {
 ## Questions
 
 1. Which objects does `UserRegistrationService` use?
+emailvalidator , userrepository , messagesender
 2. Is this inheritance or composition?
+composition
 3. Why is this better than putting all logic inside one class?
+each class has one clear job, so the code is easier to understand and change.
 4. What does composition allow us to do?
+it allows us to build a larger service using smaller objects and replace those objects when needed
 5. Explain this sentence:
 
 ```text
 Composition lets us build bigger systems from smaller, clearer pieces.
 ```
-
+It means a large program can be made by connecting several small classes, where each class performs one simple job.
 ---
 
 # Part 8 — Final Reflection 🚀
@@ -360,10 +393,15 @@ Composition lets us build bigger systems from smaller, clearer pieces.
 Answer these in your own words.
 
 1. What is the relationship between memory and objects?
+Objects are stored in memory while the program runs.
 2. What is the relationship between objects and dependencies?
+Objects depend on other objects to help them do their jobs.
 3. Why do dependencies make software harder to change?
+If classes are tightly connected, changing one can affect others.
 4. What does SOLID help us control?
+If classes are tightly connected, changing one can affect others.
 5. What does this sentence mean?
+Memory holds the program, objects organise it, and SOLID keeps it organised as it grows.
 
 ```text
 Memory is where software lives.
