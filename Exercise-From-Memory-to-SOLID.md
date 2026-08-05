@@ -229,13 +229,13 @@ public class SmsSender implements MessageSender {
 ## Questions
 
 1. What capability does `MessageSender` represent?
-   a. 
+   a. it allows for a message to be sent via any method, it only needs the message & message service
 2. Why is `MessageSender` more flexible than depending directly on `EmailSender`?
-   a. 
+   a. MessageSender allows for many message services or even email send methods to be used based on the requirements or how many attempts have been made to send an email 
 3. Which SOLID principle does this help with?
-   a.
+   a. Open / Closed Principle
 4. How does this make the system easier to extend later?
-   a. 
+   a. it gives developers the options without it resulting in a fragile system that breaks with any new feature
 
 ---
 
@@ -271,11 +271,12 @@ public class UserRegistrationService {
     private final MessageSender messageSender;
 
     public UserRegistrationService(MessageSender messageSender) {
-        // your code here
+        MessageSender.EmailSender
     }
 
     public void register(String email, String name) {
-        // your code here
+        sout("Registering user");
+        MessageSender.EmailSender(email, "Welcome, " + name);
     }
 }
 ```
@@ -283,15 +284,15 @@ public class UserRegistrationService {
 ## Questions
 
 1. What changed in the design?
-   a. 
+   a. we have made it alot more flexible 
 2. What concrete class did we remove from `UserRegistrationService`?
-   a. 
+   a. private EmailSender emailSender - new EmailSender();
 3. What abstraction does it now depend on?
-   a. 
+   a. the EmailSender interface
 4. Which principle is this?
-   a. 
+   a. DIP - Dependency Inversion Principle
 5. Why is this better?
-   a. 
+   a. it breaks down the problem into abstract (sending a message) and which message service to actually use, and therefore less dependant on one implementation
 
 ---
 
@@ -316,15 +317,15 @@ class Penguin extends Bird {
 ## Questions
 
 1. Why does this design feel logical at first?
-   a. 
+   a. because most birds can fly, so penguin and those alike are just edge cases
 2. Why does it become a problem in code?
-   a.
+   a. because there is fragmentation in what the class bird can actually do
 3. What promise does `Bird` appear to make?
-   a.
+   a. that all birds can fly
 4. How does `Penguin` break that promise?
-   a.
+   a. it cant fly
 5. Which SOLID principle is involved here?
-   a. 
+   a. Liskov Substitution Principle
 
 ## Better Design
 
@@ -356,7 +357,7 @@ Explain this sentence:
 Inheritance should preserve truth.
 ```
 ### answer
-
+there should be a set of concrete capabilities that every descendant is able to do
 
 ---
 
@@ -400,7 +401,7 @@ public class UserRegistrationService {
 ```text
 Composition lets us build bigger systems from smaller, clearer pieces.
 ```
-   a.
+    a.
 
 ---
 
@@ -409,9 +410,13 @@ Composition lets us build bigger systems from smaller, clearer pieces.
 Answer these in your own words.
 
 1. What is the relationship between memory and objects?
+   a. 
 2. What is the relationship between objects and dependencies?
+   a. 
 3. Why do dependencies make software harder to change?
+   a. 
 4. What does SOLID help us control?
+   a. 
 5. What does this sentence mean?
 
 ```text
@@ -419,6 +424,7 @@ Memory is where software lives.
 Objects give memory shape.
 SOLID keeps that shape coherent over time.
 ```
+    a. 
 
 ---
 
@@ -438,10 +444,15 @@ Your system should include:
 Then answer:
 
 1. Which classes represent responsibilities?
+   a.
 2. Which interface represents a capability?
+   a. 
 3. Where are you using composition?
+   a. 
 4. Where are you applying DIP?
+   a. 
 5. How could you add `ApplePayPaymentProcessor` without changing `CheckoutService`?
+   a. 
 
 ---
 
