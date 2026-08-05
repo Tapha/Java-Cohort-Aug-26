@@ -49,15 +49,15 @@ class User {
 ## Questions
 
 1. Which parts of this code are likely stored on the **stack**?
-   a. 
+   a. the Class User
 2. Which object is created on the **heap**?
-   a.
+   a. User user
 3. What does the variable `user` refer to?
-   a.
+   a. an instatioated object of the class User, named 'user'
 4. When `main()` finishes, what can eventually happen to the `User` object?
-   a.
+   a. garbage collection should delete it
 5. In your own words, explain this line:
-   a.
+   a. when you create an object from a class, since that is now a real thing, (not a blueprint as opposed to the class), it is something is stored in memory, and therefore now an integral part of running the program
 
 ```text
 An object is structured memory.
