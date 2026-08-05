@@ -102,19 +102,19 @@ public class UserService {
 ## Questions
 
 1. What is this class responsible for?
-   a.
+   a. for creating a new user, and all the introductory processess associated with that
 2. How many different reasons could this class change?
-   a.
+   a. a few depending on there are other things that need to be done in the intro processes (e.g. generate unique id based on name)
 3. Which method relates to validation?
-   a.
+   a. validateEmail
 4. Which method relates to persistence/database work?
-   a.
+   a. SaveUser
 5. Which method relates to email?
-   a.
+   a. sendWelcomeEmail
 6. Which method relates to reporting?
-   a.
+   a. generateUserReport
 7. Why could this class become difficult to maintain as the system grows?
-   a. 
+   a. validating the email might take a while if the database is massive, or email server may be very busy, each method will have different time requirements when instantiating registerUser
 
 ---
 
@@ -136,23 +136,37 @@ Just create the class names and method names.
 
 ```java
 public class UserRegistrationService {
+    EmailValidator.run
+    UserRepository.run
+    WelcomeEmailSender.run
+    UserReportService.run
 
 }
 
 public class EmailValidator {
-
+    input(string) - email
+    checks if it inclides 1 x @ and ends with (com, co.uk, me etc)
+    output(Boolean) - True(a real email), False()
 }
 
 public class UserRepository {
-
+    input(string) - email, name
+    output - checks and saves User into database
+    (handles duplicate user? unique id (email+name hash))
+    output (True if successful?)
 }
 
 public class WelcomeEmailSender {
-
+    input(string) - email
+    assuming EmailValidator returns True
+    sends email via email server
+    output(True if successfully send)
 }
 
 public class UserReportService {
-
+    input(string) - email
+    creates an empty report using another class?
+    output(True if successful)
 }
 ```
 
