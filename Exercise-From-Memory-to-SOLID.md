@@ -49,7 +49,9 @@ class User {
 ## Questions
 
 1. Which parts of this code are likely stored on the **stack**?
-2. Which object is created on the **heap**?
+ local var user, 
+2. Which object is created on the **heap**? 
+class user and corresponding fields (string email/name)
 3. What does the variable `user` refer to?
 4. When `main()` finishes, what can eventually happen to the `User` object? 
 user is deallocated as the stack memory doesn't outlive the function (garbage collection)
