@@ -1,10 +1,18 @@
 Database Design
 
-Restaurant Table
+User Journey 
 
-- tags - type of restaurant (vegan, vegetarian) - could be an API call
+Unique fields 
 
-Recipe Table \/ (pointer for restaurant & recipes)
+Relationships between entities(fields)
+
+Dependencies
+
+Restaurant TABLE
+
+- tags - cuisine - type of restaurant (vegan, vegetarian) - could be an API call
+
+Recipe TABLE \/ (pointer for restaurant & recipes)
 
 - originator
 
@@ -18,9 +26,15 @@ Recipe Table \/ (pointer for restaurant & recipes)
 
 - [COL]Time it takes to cook
 
---- 
+- [COL]servings
 
-Example
+Recipe item TABLE
+
+- cost of menu items or use API(Menus API) or
+
+- Recipe items -> Food items [list comparison of ingredients] pivot table with unique ID
+
+--- Example
 
 Restaurant - Nandos
 
@@ -32,17 +46,45 @@ Food items + (Food Items)Food Item Cost + Preparation Items +  + Nutrition
 
 ---
 
-Food Items Table /
+AI Output
 
- - Fridge items
+[Name of recipe] + [Ingredients] + [Instructions]
 
- - Food you need to buy
+---
 
-Food Item Cost table
+Food Items TABLE (populates over time)
+
+ - Items from the fridge (Fridge Table)
+
+ - Items from the recipe generated
+
+ -
+
+grocery store TABLE
+
+ - items you need to buy from store
+
+ - location of store
+
+ -
+
+PIVOT TABLE grocery store, Food Items 
+
+- many to many relationship
+
+Fridge TABLE
+
+- User ID
+
+- Fridge ID
+
+- Food Items
+
+Food Item Cost TABLE
 
 - cost of individual ingredients
 
-[Food Items]Nutrition table /
+[Food Items]Nutrition TABLE /
 
  - kcal, and all that stuff
 
@@ -50,17 +92,21 @@ Food Item Cost table
 
 (Could be an API - don't need to maintain that data)
 
-Inventory Table (personal / in fridge)
+Preparation Steps TABLE
 
-Preparation Items Table
+- ID
 
-- Utensils needed
+- recipe step content
 
-User Table
+- recipe ID
 
-- cooking progress
+User TABLE
 
-- saved recipes - Boolean
+- cooking progress of recipe(s)
+
+- saved recipes (
+
+- current location
 
 Images Table 
 
@@ -74,6 +120,16 @@ Video Table /
 
 - link to Recipes
 
+###Future
+
+Social TABLE
+
+Ratings TABLE
+
+payments TABLE
+
+###
+
 ----
 
 User Stories:
@@ -85,6 +141,8 @@ Primary Loop (User journeys) - (not having to go to the shop - save time)
 2\. uber eats like -> (search restaurants or directory or featured restaurants) 
 
 (loads images, user data)
+
+3\. pick cuisine
 
 3\. Take a picture of fridge (load/update current Ingredients data) ->
 
@@ -106,9 +164,11 @@ MenusApi to get food name + description (for AI to create recipe)
 
 4\. search for restaurants & recipes based on current ingredients (filters down results) ->
 
-5\. choose items they want to cook & 'checkout' -> 
+####(future functionality) x. choose menu items they want to cook & 'checkout' -> 
 
-6\. Recipe instructions -> (loads specific recipe)
+5\. list of items to buy from grocery store ->
+
+6\. Recipe instructions shown on app -> (loads specific recipe)
 
 Alt primary loop (browsable mode / if you don't mind buying ingredients)
 
@@ -134,13 +194,15 @@ Alt primary loop (browsable mode / if you don't mind buying ingredients)
 
 4\. send that to AI to get a recipe
 
----
+5.
 
 get fridge ingredients, get ai to get approximate dishes, then do menu search based on location
 
 get fridge ingredients, allow for substitutions (ingredients)
 
 icon for cuisines - user input after picture is taken
+
+###### Confirmed user journey
 
 User opens app
 
@@ -160,23 +222,21 @@ AI returns recipes and (popular)restaurant it fits with
 
 (store data for custom AI model)
 
-recipe score based on compatability with current ingredients)
+recipe score based on compatibility with current ingredients)
 
 Recipe View & how to cook, timers, preheat
-
----
 
 -- create a shopping list from AI results (recipes based on what you have in pantry, 
 
 -checkbox for ingredients (what you have vs need to buy), already ticked off based on picture you took 
 
--which appliances to use (oven, airfryer, grill, pan)
+-which appliances to use (oven, air fryer, grill, pan)
 
----
+######
 
 Secondary Loop
 
----
+1.
 
 Tertiary Loop
 
