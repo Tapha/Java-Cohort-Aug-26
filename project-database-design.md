@@ -8,6 +8,8 @@ VARCHAR(50) - longitude
 
 VARCHAR(50) - latitude
 
+---
+
 Restaurant Cuisine TABLE
 
 PRIMARY KEY - INT - ID(INDEX)
@@ -15,6 +17,8 @@ PRIMARY KEY - INT - ID(INDEX)
 FOREIGN KEY - Restaurant ID [Link to Restaurant table]
 
 ENUM(50) - Cuisines
+
+---
 
 Recipe TABLE \/ (pointer for restaurant & recipes)
 
@@ -36,6 +40,8 @@ VARCHAR(255) - Originator of recipe
 
 - [COL]servings
 
+---
+
 RECIPE METADATA TABLE
 
 PRIMARY KEY - INT - ID(INDEX)
@@ -43,6 +49,8 @@ PRIMARY KEY - INT - ID(INDEX)
 FOREIGN KEY - Recipe ID [Link to Recipe table]
 
 ENUM(40) - recipe metadata (e.g. servings, time to cook)
+
+---
 
 Recipe item TABLE
 
@@ -54,6 +62,8 @@ VARCHAR(255) - Menu Item Name
 
 FLOAT() - Cost of menu item
 
+---
+
 Quesadilla [1 to many]
 
     \/          \/          \/              \/
@@ -61,6 +71,8 @@ Quesadilla [1 to many]
 1 x Wrap, 100g chicken, 30g pico de gallo, 25g cheese
 
 get ai to use metric system for proportions
+
+---
 
 Recipe Food Items TABLE
 
@@ -76,6 +88,8 @@ VARCHAR(255) - measurement text ("2 of ")
 
 (Picture of fridge populates this table & other things  \/)
 
+---
+
 Food Items TABLE
 
 PRIMARY KEY - INT - ID(INDEX)
@@ -87,6 +101,8 @@ VARCHAR(255) - Name of ingredient
 FOREIGN KEY - INT - Fridge ID
 
 BOOLEAN(True/False) - Available (in fridge)
+
+---
 
 Grocery store TABLE
 
@@ -101,6 +117,8 @@ VARCHAR(50) - latitude
 (PIVOT TABLE grocery store, Food Items - BASED on Available in fridge)
 
 (- many to many relationship)
+
+---
 
 Grocery store inventory TABLE
 
@@ -118,6 +136,8 @@ INT() - measurement unit (5 x)
 
 VARCHAR(255) - measurement text ("2 of ")
 
+---
+
 Fridge TABLE
 
 PRIMARY KEY - INT - Fridge ID(INDEX)
@@ -131,6 +151,8 @@ PRIMARY KEY - INT - ID
 PRIMARY KEY - INT - Recipe ID(INDEX)
 
 VARCHAR(255) - Recipe Step
+
+---
 
 User TABLE
 
@@ -152,6 +174,8 @@ INT() - how many steps 
 
 INT() - current step (can be used to show a percentage)
 
+---
+
 Saved Recipes TABLE
 
 PRIMARY KEY - INT - ID
@@ -159,6 +183,8 @@ PRIMARY KEY - INT - ID
 FOREIGN KEY - Recipe ID
 
 FOREIGN KEY - USER ID
+
+---
 
 Dietary Preferences TABLE 
 
@@ -168,11 +194,15 @@ FOREIGN KEY - User ID [Link to User table]
 
 ENUM(10) - Dietary choice
 
+---
+
 Images Table
 
 PRIMARY KEY - INT - ID
 
 VARCHAR(255) - URL (CDN)
+
+---
 
 Video Table
 
