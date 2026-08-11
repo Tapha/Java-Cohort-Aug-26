@@ -28,17 +28,11 @@ LONGTEXT() - Description of recipe (covers metadata)
 
 VARCHAR(255) - Originator of recipe
 
-- originator
-
-- links to restaurant
-
 - links to food items
 
 - checklist of steps
 
 - [COL]price of recipe at xyz restaurant (average) - could be an API call
-
-- [COL]Time it takes to cook
 
 - [COL]servings
 
@@ -48,91 +42,123 @@ PRIMARY KEY - INT - ID(INDEX)
 
 FOREIGN KEY - Recipe ID [Link to Recipe table]
 
-ENUM(40) - recipe metadata (servings)
+ENUM(40) - recipe metadata (e.g. servings, time to cook)
 
 Recipe item TABLE
 
-PRIMARY KEY -
+PRIMARY KEY - INT - Recipe Item ID(INDEX)
 
-- cost of menu items or use API(Menus API) or
+FOREIGN KEY - Recipe ID [Link to Recipe]
 
-- Recipe items -> Food items [list comparison of ingredients] pivot table with unique ID
+VARCHAR(255) - Menu Item Name
 
---- Example
+FLOAT() - Cost of menu item
 
-Restaurant - Nandos
+Quesadilla [1 to many]
 
-Recipes -  1/4 Chicken, Butterfly Burger, 
+    \/          \/          \/              \/
 
-Restaurant -> Recipe -> 
+1 x Wrap, 100g chicken, 30g pico de gallo, 25g cheese
 
-Food items + (Food Items)Food Item Cost + Preparation Items +  + Nutrition
+get ai to use metric system for proportions
 
----
+Recipe Food Items TABLE
 
-AI Output
+PRIMARY KEY - INT - ID(INDEX)
 
-[Name of recipe] + [Ingredients] + [Instructions]
+FOREIGN KEY - INT - Food item ID
 
----
+ENUM(50) - different units of measurements (grams, liter, tbsp)
 
-Food Items TABLE (populates over time)
+INT() - measurement unit (5 x)
 
- - Items from the fridge (Fridge Table)
+VARCHAR(255) - measurement text ("2 of ")
 
- - Items from the recipe generated
+(Picture of fridge populates this table & other things  \/)
 
- -
+Food Items TABLE
 
-grocery store TABLE
+PRIMARY KEY - INT - ID(INDEX)
 
- - items you need to buy from store
+FOREIGN KEY - Image ID
 
- - location of store
+VARCHAR(255) - Name of ingredient
 
- -
+FOREIGN KEY - INT - Fridge ID
 
-PIVOT TABLE grocery store, Food Items 
+BOOLEAN(True/False) - Available (in fridge)
 
-- many to many relationship
+Grocery store TABLE
+
+PRIMARY KEY - INT - ID(INDEX)
+
+VARCHAR(255) - Name of store
+
+VARCHAR(50) - longitude
+
+VARCHAR(50) - latitude
+
+(PIVOT TABLE grocery store, Food Items - BASED on Available in fridge)
+
+(- many to many relationship)
+
+Grocery store inventory TABLE
+
+PRIMARY KEY - INT - ID(INDEX)
+
+FOREIGN KEY - INT - Grocery Store ID
+
+FOREIGN KEY - INT - Food Item ID
+
+FLOAT(2dp) - Price
+
+ENUM(50) - different units of measurements (grams, liter, tbsp)
+
+INT() - measurement unit (5 x)
+
+VARCHAR(255) - measurement text ("2 of ")
 
 Fridge TABLE
 
-- User ID
+PRIMARY KEY - INT - Fridge ID(INDEX)
 
-- Fridge ID
-
-- Food Items
-
-Food Item Cost TABLE
-
-- cost of individual ingredients
-
-[Food Items]Nutrition TABLE /
-
- - kcal, and all that stuff
-
- - macros
-
-(Could be an API - don't need to maintain that data)
+VARCHAR(255) - Fridge Name
 
 Preparation Steps TABLE
 
-- ID
+PRIMARY KEY - INT - ID
 
-- recipe step content
+PRIMARY KEY - INT - Recipe ID(INDEX)
 
-- recipe ID
+VARCHAR(255) - Recipe Step
 
 User TABLE
 
-PRIMARY KEY - INT - User ID
+PRIMARY KEY - INT - ID
 
-- cooking progress of recipe(s)
+VARCHAR(255) - Name
 
-- saved recipes (
+VARCHAR(50) - Rough/Saved longitude
 
-- current location
+VARCHAR(50) - Rough/Saved latitude
+
+Preparation Steps Progress TABLE
+
+PRIMARY KEY - INT - ID
+
+FOREIGN KEY - Preparation Steps ID
+
+INT() - how many steps 
+
+INT() - current step (can be used to show a percentage)
+
+Saved Recipes TABLE
+
+PRIMARY KEY - INT - ID
+
+FOREIGN KEY - Recipe ID
+
+FOREIGN KEY - USER ID
 
 Dietary Preferences TABLE 
 
@@ -142,14 +168,14 @@ FOREIGN KEY - User ID [Link to User table]
 
 ENUM(10) - Dietary choice
 
-Images Table 
+Images Table
 
-- link to CDN
+PRIMARY KEY - INT - ID
 
-- link to Recipes
+VARCHAR(255) - URL (CDN)
 
-Video Table /
+Video Table
 
-- link to CDN
+PRIMARY KEY - INT - ID
 
-- link to Recipes
+VARCHAR(255) - URL (CDN)
