@@ -1,135 +1,235 @@
-Table restaurants {
+Enum CuisineType {
+  Italian
+  Indian
+  Chinese
+  Japanese
+  Mexican
+  American
+  French
+  Other
+}
+
+Enum MeasurementUnit {
+  gram
+  kilogram
+  millilitre
+  litre
+  tsp
+  tbsp
+  cup
+  piece
+}
+
+Enum DietaryChoice {
+  Vegan
+  Vegetarian
+  Pescatarian
+  Halal
+  Kosher
+  GlutenFree
+  DairyFree
+}
+
+Table Restaurant {
   id int [pk, increment]
   restaurant_name varchar(255)
   longitude varchar(50)
   latitude varchar(50)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table restaurant_cuisines {
+Table RestaurantCuisine {
   id int [pk, increment]
-  restaurant_id int [not null, ref: > restaurants.id]
-  cuisine varchar(50)
+  restaurant_id int [ref: > Restaurant.id]
+  cuisine CuisineType
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table recipes {
+Table Recipe {
   id int [pk, increment]
-  restaurant_id int [not null, ref: > restaurants.id]
+  restaurant_id int [ref: > Restaurant.id]
+
   recipe_name varchar(255)
   description longtext
-  originator varchar(255)
-
-  // AI-generated metadata
+  recipe_originator varchar(255)
   avg_restaurant_price decimal(10,2)
-  servings int
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table recipe_metadata {
+Table RecipeMetadata {
   id int [pk, increment]
-  recipe_id int [not null, ref: > recipes.id]
-  metadata_type varchar(40)
-  metadata_value varchar(255)
+  recipe_id int [ref: > Recipe.id]
+
+  metadata_name varchar(100)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table recipe_items {
+Table RecipeItem {
   id int [pk, increment]
-  recipe_id int [not null, ref: > recipes.id]
+  recipe_id int [ref: > Recipe.id]
+
   menu_item_name varchar(255)
   cost decimal(10,2)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table food_items {
+Table RecipeFoodItems {
   id int [pk, increment]
-  image_id int [ref: > images.id]
-  fridge_id int [ref: > fridges.id]
+
+  recipe_id int [ref: > Recipe.id]
+  food_item_id int [ref: > FoodItems.id]
+
+  measurement_unit MeasurementUnit
+  measurement_quantity int
+  measurement_text varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Images {
+  id int [pk, increment]
+  url varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table FoodItems {
+  id int [pk, increment]
+
+  image_id int [ref: > Images.id]
+  fridge_id int [ref: > Fridge.id]
 
   ingredient_name varchar(255)
   available boolean
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table recipe_food_items {
+Table GroceryStore {
   id int [pk, increment]
-  recipe_id int [not null, ref: > recipes.id]
-  food_item_id int [not null, ref: > food_items.id]
 
-  measurement_unit varchar(50)
-  measurement_value decimal(10,2)
-  measurement_text varchar(255)
-
-  Note: 'Use metric units where possible (g, kg, ml, l)'
-}
-
-Table grocery_stores {
-  id int [pk, increment]
   store_name varchar(255)
   longitude varchar(50)
   latitude varchar(50)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table grocery_store_inventory {
+Table GroceryStoreInventory {
   id int [pk, increment]
-  grocery_store_id int [not null, ref: > grocery_stores.id]
-  food_item_id int [not null, ref: > food_items.id]
+
+  grocery_store_id int [ref: > GroceryStore.id]
+  food_item_id int [ref: > FoodItems.id]
 
   price decimal(10,2)
 
-  measurement_unit varchar(50)
-  measurement_value decimal(10,2)
+  measurement_unit MeasurementUnit
+  measurement_quantity int
   measurement_text varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table fridges {
+Table Users {
   id int [pk, increment]
-  fridge_name varchar(255)
-}
 
-Table preparation_steps {
-  id int [pk, increment]
-  recipe_id int [not null, ref: > recipes.id]
-  step_number int
-  recipe_step varchar(255)
-}
-
-Table users {
-  id int [pk, increment]
   name varchar(255)
-  saved_longitude varchar(50)
-  saved_latitude varchar(50)
+  longitude varchar(50)
+  latitude varchar(50)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table preparation_step_progress {
+Table Fridge {
   id int [pk, increment]
-  user_id int [ref: > users.id]
-  recipe_id int [ref: > recipes.id]
-  preparation_step_id int [ref: > preparation_steps.id]
+
+  user_id int [ref: > Users.id]
+  fridge_name varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table PreparationSteps {
+  id int [pk, increment]
+
+  recipe_id int [ref: > Recipe.id]
+  recipe_step varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table PreparationStepsProgress {
+  id int [pk, increment]
+
+  preparation_step_id int [ref: > PreparationSteps.id]
 
   total_steps int
   current_step int
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table saved_recipes {
+Table SavedRecipes {
   id int [pk, increment]
-  recipe_id int [not null, ref: > recipes.id]
-  user_id int [not null, ref: > users.id]
+
+  recipe_id int [ref: > Recipe.id]
+  user_id int [ref: > Users.id]
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table dietary_preferences {
+Table DietaryPreferences {
   id int [pk, increment]
-  user_id int [not null, ref: > users.id]
-  dietary_choice varchar(50)
+
+  user_id int [ref: > Users.id]
+  dietary_choice DietaryChoice
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
 
-Table images {
+Table Video {
   id int [pk, increment]
+
   url varchar(255)
-}
 
-Table videos {
-  id int [pk, increment]
-  url varchar(255)
-}
-
-Table recipe_videos {
-  id int [pk, increment]
-  recipe_id int [not null, ref: > recipes.id]
-  video_id int [not null, ref: > videos.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
 }
