@@ -1,3 +1,16 @@
+The units table is added to
+give your database a clean,
+consistent place to store
+measurement units.
+It keeps all units organised
+by name, symbol, and type,
+so you don’t end up with
+messy values like “g”,
+“gram”, or “grams”
+scattered everywhere.
+
+
+
 Table restaurants {
   id int [pk, increment]
   restaurant_name varchar(255)
