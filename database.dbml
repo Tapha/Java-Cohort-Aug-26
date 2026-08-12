@@ -1,0 +1,135 @@
+Table restaurants {
+  id int [pk, increment]
+  restaurant_name varchar(255)
+  longitude varchar(50)
+  latitude varchar(50)
+}
+
+Table restaurant_cuisines {
+  id int [pk, increment]
+  restaurant_id int [not null, ref: > restaurants.id]
+  cuisine varchar(50)
+}
+
+Table recipes {
+  id int [pk, increment]
+  restaurant_id int [not null, ref: > restaurants.id]
+  recipe_name varchar(255)
+  description longtext
+  originator varchar(255)
+
+  // AI-generated metadata
+  avg_restaurant_price decimal(10,2)
+  servings int
+}
+
+Table recipe_metadata {
+  id int [pk, increment]
+  recipe_id int [not null, ref: > recipes.id]
+  metadata_type varchar(40)
+  metadata_value varchar(255)
+}
+
+Table recipe_items {
+  id int [pk, increment]
+  recipe_id int [not null, ref: > recipes.id]
+  menu_item_name varchar(255)
+  cost decimal(10,2)
+}
+
+Table food_items {
+  id int [pk, increment]
+  image_id int [ref: > images.id]
+  fridge_id int [ref: > fridges.id]
+
+  ingredient_name varchar(255)
+  available boolean
+}
+
+Table recipe_food_items {
+  id int [pk, increment]
+  recipe_id int [not null, ref: > recipes.id]
+  food_item_id int [not null, ref: > food_items.id]
+
+  measurement_unit varchar(50)
+  measurement_value decimal(10,2)
+  measurement_text varchar(255)
+
+  Note: 'Use metric units where possible (g, kg, ml, l)'
+}
+
+Table grocery_stores {
+  id int [pk, increment]
+  store_name varchar(255)
+  longitude varchar(50)
+  latitude varchar(50)
+}
+
+Table grocery_store_inventory {
+  id int [pk, increment]
+  grocery_store_id int [not null, ref: > grocery_stores.id]
+  food_item_id int [not null, ref: > food_items.id]
+
+  price decimal(10,2)
+
+  measurement_unit varchar(50)
+  measurement_value decimal(10,2)
+  measurement_text varchar(255)
+}
+
+Table fridges {
+  id int [pk, increment]
+  fridge_name varchar(255)
+}
+
+Table preparation_steps {
+  id int [pk, increment]
+  recipe_id int [not null, ref: > recipes.id]
+  step_number int
+  recipe_step varchar(255)
+}
+
+Table users {
+  id int [pk, increment]
+  name varchar(255)
+  saved_longitude varchar(50)
+  saved_latitude varchar(50)
+}
+
+Table preparation_step_progress {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  recipe_id int [ref: > recipes.id]
+  preparation_step_id int [ref: > preparation_steps.id]
+
+  total_steps int
+  current_step int
+}
+
+Table saved_recipes {
+  id int [pk, increment]
+  recipe_id int [not null, ref: > recipes.id]
+  user_id int [not null, ref: > users.id]
+}
+
+Table dietary_preferences {
+  id int [pk, increment]
+  user_id int [not null, ref: > users.id]
+  dietary_choice varchar(50)
+}
+
+Table images {
+  id int [pk, increment]
+  url varchar(255)
+}
+
+Table videos {
+  id int [pk, increment]
+  url varchar(255)
+}
+
+Table recipe_videos {
+  id int [pk, increment]
+  recipe_id int [not null, ref: > recipes.id]
+  video_id int [not null, ref: > videos.id]
+}
