@@ -37,6 +37,13 @@ Table recipe_items {
   cost decimal(10,2)
 }
 
+Table units {
+  id int [pk, increment]
+  unit_name varchar(50)
+  unit_symbol varchar(10)
+  unit_type varchar(20)
+}
+
 Table food_items {
   id int [pk, increment]
   image_id int [ref: > images.id]
