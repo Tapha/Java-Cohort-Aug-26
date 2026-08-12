@@ -1,0 +1,615 @@
+# Founding Spec
+
+## 1. Product Definition
+
+The product helps people turn **what they already have at home into a restaurant-style meal they can realistically cook**. A user identifies their available ingredients, chooses a cuisine or dietary preference, and receives suitable dishes inspired by restaurant/menu items, ranked by how well they match what is already available. The product then closes the loop by showing what additional ingredients are required and guiding the user through cooking the selected meal. Restaurant discovery and menu data provide the source of culinary inspiration; AI transforms incomplete ingredient and menu information into useful recipe candidates and adaptations, but does not make authoritative restaurant or product data authoritative by itself.
+
+## 2. Problem / Wedge
+
+The initial problem is **“I want to eat something good, preferably like something I would order at a restaurant, but I do not want to make an unnecessary trip to the shop.”**
+
+Existing recipe experiences generally start with a recipe and ask the user to acquire its ingredients. This product starts from the opposite direction: **the user's existing ingredients are the constraint**.
+
+The wedge is therefore not simply recipe generation. It is the ability to answer:
+
+> **“Given what is in my fridge right now, what restaurant-style meal can I make, and what is the minimum I need to get to cook it?”**
+
+This makes the fridge the starting point and the cooked meal the outcome.
+
+## 3. Target User
+
+The initial user is a home cook who:
+
+* has a variable collection of ingredients available at home;
+* wants something more interesting than an improvised basic meal;
+* enjoys restaurant food or specific cuisines;
+* wants to save time, money, or an unnecessary shopping trip;
+* is comfortable using a phone to photograph their fridge and follow guided cooking instructions;
+* may be willing to buy a small number of missing ingredients, but does not want to start with a full shopping trip.
+
+The product does not initially need to target professional cooks, highly precise nutritional planning, serious meal-prep users, or social cooking communities.
+
+## 4. Core Product Invariant
+
+**Given a user's available ingredients and preferences, the product should identify a credible restaurant-style meal that the user can realistically cook, clearly distinguish what they already have from what they still need, and guide them to the finished dish.**
+
+Everything else is supporting infrastructure or an enhancement to this invariant.
+
+A restaurant name, a specific menu API, a particular AI model, a grocery provider, or a particular database structure may change. The invariant should not.
+
+## 5. Primary User Loop
+
+The smallest complete journey is:
+
+1. **Open the app and establish preferences** — the user selects a desired cuisine and/or relevant dietary constraints.
+2. **Capture what is available** — the user photographs their fridge, and the system produces an ingredient list that can be reviewed or corrected.
+3. **Find suitable dishes** — the system evaluates restaurant-style dishes against the available ingredients and preferences.
+4. **Choose a dish** — the user sees why the dish is a good fit, including what they already have and what is missing.
+5. **Complete the ingredient gap** — the system creates a shopping list containing only the additional ingredients required.
+6. **Cook** — the user receives an adapted recipe with ingredients, quantities where sufficiently known, preparation steps, and relevant cooking guidance.
+7. **Reach the meal outcome** — the user successfully cooks the selected restaurant-style dish without having had to acquire an entirely new set of ingredients.
+
+The loop is complete when the user can **move from their existing fridge to a plausible cooked meal**.
+
+Restaurant browsing is a means of discovering and grounding dishes, not the fundamental user outcome.
+
+## 6. Product Inputs
+
+The product fundamentally needs the following information:
+
+### User-provided information
+
+* Current available ingredients.
+* Desired cuisine or culinary direction.
+* Dietary restrictions/preferences.
+* Optional corrections to detected ingredients.
+* Selected recipe.
+* Potentially the user's location when local restaurant or grocery context is required.
+
+### Restaurant/menu information
+
+* Restaurant identity.
+* Restaurant cuisine/type.
+* Menu item name.
+* Menu item description where available.
+* Restaurant location.
+* Restaurant/menu availability.
+* Restaurant pricing where available and sufficiently current.
+
+### Recipe information
+
+* Dish name.
+* Restaurant association or culinary origin.
+* Ingredients.
+* Ingredient quantities where known.
+* Preparation instructions.
+* Cooking time where known.
+* Servings where known.
+* Appliances or cooking methods where relevant.
+
+### Ingredient information
+
+The system needs a sufficiently normalised understanding of ingredients so that:
+
+* fridge ingredients can be compared with recipe ingredients;
+* equivalent or compatible ingredients can be recognised;
+* missing ingredients can be identified;
+* substitutions can eventually be considered;
+* shopping requirements can be expressed clearly.
+
+### Optional supporting information
+
+* Ingredient prices.
+* Nutrition.
+* Images.
+* Cooking videos.
+* Grocery-store availability.
+
+These are useful supporting data, but they are not required to define the core product.
+
+## 7. Product Outputs
+
+The user should receive:
+
+1. **A recognised ingredient inventory** from the fridge image, with the ability to correct obvious mistakes.
+2. **Candidate restaurant-style dishes** compatible with the user's cuisine/preferences.
+3. **A compatibility indication or score** showing how well each candidate fits what the user already has.
+4. **A clear ingredient comparison**:
+
+   * already available;
+   * missing;
+   * optionally substitutable.
+5. **A selected recipe/adaptation** that turns the dish concept into something the user can cook.
+6. **A shopping list** containing only the required additional ingredients.
+7. **Cooking instructions** sufficient to prepare the dish.
+8. **Cooking context** where available, such as preparation time, servings, appliance, timers, or preheating instructions.
+
+The product should not imply that an AI-generated recipe is an exact reproduction of a restaurant's proprietary recipe unless there is authoritative evidence for that claim.
+
+## 8. Core Domain Concepts
+
+The existing DBML provides useful evidence for the product's domain model. The important product concepts are broader than individual tables.
+
+### User
+
+Represents the person using the product, including their preferences, location context, saved dishes, and cooking activity.
+
+The schema supports the basic user concept and dietary preferences.
+
+### Fridge / Available Ingredients
+
+Represents the user's current ingredient inventory.
+
+The existing `Fridge` and `FoodItems` concepts support this well enough for the founding loop: ingredients belong to a user's fridge and can be marked as available.
+
+The product concept is more important than the physical fridge metaphor: the system needs a trustworthy representation of **what the user currently has available**.
+
+### Food Item / Ingredient
+
+Represents a normalised ingredient that can participate in multiple contexts:
+
+* something detected in the fridge;
+* something required by a recipe;
+* something that may need to be purchased.
+
+This is one of the most important shared concepts in the system because ingredient compatibility depends on comparing like with like.
+
+### Restaurant
+
+Represents the restaurant or culinary source associated with a dish.
+
+The existing schema captures identity, location, and cuisine. The restaurant is useful for grounding the user's mental model of the dish and providing a source for menu information.
+
+The product should not require every restaurant to have a complete recipe.
+
+### Menu Item / Restaurant Dish
+
+Represents the dish as it exists in a restaurant/menu context.
+
+This is distinct from a home-cooking recipe. A menu item may have a name and description without exposing its actual ingredients or preparation method.
+
+The current schema partly represents this through `Recipe` and `RecipeItem`, but the product distinction should remain explicit conceptually.
+
+### Recipe
+
+Represents the actionable home-cooking interpretation of a dish.
+
+A recipe may be:
+
+* derived from authoritative recipe information;
+* adapted from restaurant/menu information;
+* generated or transformed by AI;
+* associated with a restaurant-style dish without being the restaurant's actual recipe.
+
+This distinction is critical to maintaining trust.
+
+### Recipe Ingredient Relationship
+
+Represents which ingredients a recipe requires, including quantities and units where known.
+
+The existing `RecipeFoodItems` concept supports the core comparison between available ingredients and required ingredients.
+
+### Preparation Step
+
+Represents the ordered actions required to cook the recipe.
+
+The existing `PreparationSteps` concept directly supports the cooking portion of the primary loop.
+
+### Recipe Progress
+
+Represents where the user currently is while cooking.
+
+This is useful for completing the cooking experience, although persistence of detailed progress is less fundamental than the recipe instructions themselves.
+
+### Shopping Requirement
+
+Represents the gap between what a recipe requires and what the user already has.
+
+This is a core product concept even though the existing schema does not model a distinct shopping-list concept clearly. The founding loop needs this concept regardless of how it is eventually represented.
+
+### Grocery Store / Inventory
+
+Represents an optional source for obtaining missing ingredients.
+
+The existing `GroceryStore` and `GroceryStoreInventory` concepts suggest a future capability to connect missing ingredients to nearby stores and prices.
+
+This is supporting the primary loop, but precise store inventory is not necessarily required for the first convincing version.
+
+### Dietary Preference
+
+Represents constraints that candidate dishes must respect.
+
+The existing `DietaryPreferences` concept supports this.
+
+### Saved Recipe
+
+Represents a dish the user wants to return to.
+
+The existing `SavedRecipes` concept supports retention but is secondary to the first successful cook.
+
+### Media
+
+Images and videos support recipe discovery and cooking guidance.
+
+They enhance confidence and usability but are not fundamental to proving the founding proposition.
+
+### AI-Generated Recipe / AI Derivation
+
+Represents the provenance of an AI transformation.
+
+The existing `AIGeneratedRecipe` concept demonstrates that the team already recognises the need to distinguish AI-generated material from ordinary recipe data.
+
+The important product requirement is **provenance**, not merely storing a prompt and output.
+
+## 9. AI Responsibilities
+
+AI is responsible for **interpretation and transformation of uncertain or unstructured culinary information**.
+
+### Fridge image → ingredient recognition
+
+**Input:**
+
+* Fridge image(s).
+
+**Conceptual output:**
+
+* Structured list of detected food/ingredient items.
+* Normalised ingredient names where possible.
+* Confidence/uncertainty where recognition is ambiguous.
+* Potentially quantity or state information only when reliably inferable.
+
+The output must be structured enough for deterministic application logic to compare it against recipe ingredients.
+
+AI should not silently convert uncertain visual recognition into confirmed inventory.
+
+### Ingredients + preferences → candidate dishes
+
+**Input:**
+
+* Normalised available ingredients.
+* Cuisine preference.
+* Dietary restrictions.
+* Potentially location/restaurant context.
+* Available restaurant/menu candidates.
+
+**Conceptual output:**
+
+* Candidate dishes.
+* Required ingredients.
+* Available ingredient matches.
+* Missing ingredients.
+* Potential substitutions where appropriate.
+* Compatibility rationale/score.
+* Restaurant/menu association when supported by source data.
+
+The AI should recommend from an identified candidate universe where possible rather than inventing restaurant associations without evidence.
+
+### Menu information → recipe association/adaptation
+
+**Input:**
+
+* Restaurant identity.
+* Menu item name.
+* Menu description.
+* Known ingredients or recipe information.
+* User's available ingredients.
+
+**Output:**
+
+* A restaurant-style dish interpretation.
+* Structured ingredients.
+* Preparation instructions.
+* Adaptations required to make the dish feasible with the user's ingredients.
+
+The output should carry a distinction between:
+
+* **source facts** — what the restaurant/menu actually states;
+* **inferences** — what AI believes the dish likely contains;
+* **generated instructions** — what the product proposes the user cook.
+
+### Ingredient compatibility
+
+AI may help determine semantic equivalence or compatibility where simple exact matching is insufficient.
+
+For example, it may recognise that a particular form of an ingredient can satisfy a recipe requirement or propose a reasonable substitute.
+
+However, compatibility decisions that affect dietary safety, allergens, or materially change a dish should not be presented as certain without appropriate qualification.
+
+### Recipe generation/adaptation
+
+AI may transform a dish concept and ingredient set into an executable home recipe.
+
+Its structured output should conceptually contain:
+
+* recipe identity;
+* ingredient list;
+* quantities/units where known or safely estimated;
+* preparation steps;
+* cooking method;
+* timing;
+* servings where appropriate;
+* substitutions/adaptations;
+* provenance/uncertainty indicators.
+
+AI is therefore a **reasoning and generation layer**, not the system of record for authoritative external facts.
+
+## 10. Non-AI Responsibilities
+
+Deterministic application behaviour should remain responsible for:
+
+* user identity and preferences;
+* storing the user's current ingredient inventory;
+* accepting user corrections;
+* persisting recipes and relationships;
+* determining whether an ingredient is marked available;
+* comparing structured ingredients where exact matching is sufficient;
+* calculating shopping-list gaps from accepted ingredient data;
+* managing saved recipes;
+* tracking cooking progress;
+* displaying authoritative restaurant/menu information;
+* presenting prices received from external sources;
+* enforcing dietary filters where source data is sufficiently authoritative;
+* maintaining provenance between external data, user input, and AI-derived information;
+* handling application state and navigation.
+
+External data should remain distinguishable from AI interpretation.
+
+For example:
+
+> “Nando's lists this menu item”
+
+is fundamentally different from:
+
+> “AI believes this recipe is a reasonable home recreation of that menu item.”
+
+The product must preserve that distinction.
+
+## 11. External Capabilities
+
+The product may depend on several external capabilities. These should be treated as **capability boundaries**, not commitments to particular vendors.
+
+### Location and geographic discovery
+
+Capability required:
+
+* determine approximate user location;
+* find restaurants within a relevant geographic radius;
+* optionally find nearby grocery stores.
+
+Exact location precision should be minimised to what the product actually needs.
+
+### Restaurant discovery
+
+Capability required:
+
+* restaurant identity;
+* location;
+* cuisine/category;
+* potentially dietary/type attributes.
+
+### Restaurant menu retrieval
+
+This is currently one of the most important external dependencies and one of the largest uncertainties.
+
+Capability required:
+
+* determine whether a restaurant has usable menu data;
+* retrieve menu item names and descriptions;
+* retrieve menu data with sufficient freshness and geographic specificity.
+
+The product should tolerate incomplete coverage rather than assume every discovered restaurant has usable menu data.
+
+### Recipe/source information
+
+Capability required:
+
+* authoritative or reasonably trustworthy recipe/menu information where available;
+* source attribution/provenance.
+
+The product does not require an external recipe provider if menu information plus AI adaptation is sufficient, but the quality of the resulting dish depends heavily on the quality of its source material.
+
+### Grocery discovery
+
+Optional capability:
+
+* identify nearby stores;
+* identify whether required ingredients are sold;
+* retrieve approximate/current prices where available.
+
+This should not become a dependency on precise live inventory for the founding loop.
+
+### Nutrition
+
+Optional capability:
+
+* calories;
+* macronutrients;
+* other nutritional information.
+
+Nutrition can be externally sourced and should be treated as informational data rather than an AI-generated fact.
+
+### Media
+
+Optional capability:
+
+* recipe images;
+* cooking videos;
+* CDN/media storage.
+
+Media improves confidence and cooking usability but is not part of the irreducible product proposition.
+
+## 12. First-Version Scope
+
+The first convincing end-to-end product should contain:
+
+* user onboarding;
+* cuisine selection;
+* basic dietary preferences;
+* fridge-image ingredient recognition;
+* user correction of recognised ingredients;
+* a normalised ingredient inventory;
+* restaurant/menu-derived or restaurant-style dish candidates;
+* candidate filtering against available ingredients;
+* a meaningful compatibility indication;
+* a clear distinction between available and missing ingredients;
+* AI-assisted recipe adaptation/generation;
+* a structured recipe view;
+* a generated shopping list;
+* cooking instructions;
+* basic cooking progress through the recipe.
+
+The founding version does **not** need comprehensive restaurant coverage, perfect menu coverage, precise live grocery inventory, or a sophisticated personalised recommendation engine.
+
+A constrained but reliable experience with a small set of well-supported restaurants/cuisines is more valuable than a broad directory producing unreliable recipes.
+
+## 13. Explicit Non-Goals
+
+The following should not distort the first version:
+
+* Social networking.
+* Public user profiles.
+* Comments.
+* Recipe voting.
+* Community ratings.
+* Social sharing as a core workflow.
+* Payments.
+* Restaurant ordering or checkout.
+* Sponsored/paid recipe placement.
+* Sponsored restaurants.
+* Advanced recommendation/personalisation systems.
+* Full meal planning.
+* Automated weekly meal plans.
+* Comprehensive grocery delivery.
+* Exact restaurant recipe replication as a product promise.
+* Comprehensive nutritional planning.
+* Sophisticated video production.
+* Full grocery-store inventory coverage.
+* Marketplace functionality.
+
+“Checkout” in the brainstorm should therefore be interpreted initially as **selecting a dish and generating the ingredients needed to cook it**, not purchasing the restaurant meal.
+
+## 14. Assumptions Requiring Validation
+
+### Restaurant/menu availability
+
+The product assumes sufficiently broad access to usable restaurant menu information. This is currently a major risk. If menu coverage is poor, the restaurant-driven wedge may need to be narrowed or repositioned around restaurant-style dishes rather than direct menu replication.
+
+### Restaurant-to-recipe mapping
+
+The product assumes that a menu item can be transformed into a credible home recipe.
+
+This is not equivalent to possessing the restaurant's recipe. The quality and trustworthiness of this transformation need validation.
+
+### Ingredient recognition
+
+The product assumes that a photograph can produce a sufficiently useful ingredient list.
+
+The important metric is not perfect computer vision accuracy; it is whether users can quickly correct the result without abandoning the flow.
+
+### Ingredient normalisation
+
+The system assumes that different representations of ingredients can be meaningfully compared.
+
+This is foundational to compatibility scoring and shopping-list generation.
+
+### Compatibility scoring
+
+The product assumes that “how much of this recipe can I make with what I have?” is useful to users and can be communicated intelligibly.
+
+The scoring model should not imply false precision.
+
+### Substitutions
+
+The product assumes that some missing ingredients can be replaced without making the resulting dish unreasonable.
+
+Substitution is valuable but potentially risky and should be treated as a recommendation rather than an unquestionable equivalence.
+
+### Dietary constraints
+
+The product assumes that AI and/or external data can identify whether recipes satisfy dietary preferences.
+
+This requires particular caution because dietary labels can carry safety implications. The product should not treat inferred dietary compatibility as authoritative where source evidence is insufficient.
+
+### Location relevance
+
+The product assumes that nearby restaurants add meaningful value to the restaurant-style discovery experience.
+
+This needs validation against whether users actually care about restaurants geographically close to them or simply want dishes from known/popular restaurants.
+
+### Price accuracy
+
+Restaurant and grocery prices are likely to become stale.
+
+Prices should therefore be treated as time-sensitive external information, not permanent product truth.
+
+### Grocery availability
+
+The product assumes that a shopping list is useful even when it cannot guarantee real-time stock at a particular store.
+
+Precise live inventory is not necessary to prove the founding proposition.
+
+### Data ownership and provenance
+
+Restaurant menus, images, descriptions, recipes, nutrition information, and videos may have different ownership and usage restrictions.
+
+The product must validate that the data it stores, transforms, displays, and caches can legally be used for the intended experience.
+
+### AI reliability
+
+The product assumes AI can generate sufficiently coherent recipes from incomplete information.
+
+This needs validation through actual cooking outcomes, not merely whether generated text appears plausible.
+
+### Cache/reuse of AI results
+
+The brainstorm assumes that AI outputs can be stored and reused.
+
+That may improve efficiency, but cached AI output must not become confused with authoritative source data or an immutable truth.
+
+## 15. Success Condition
+
+**“The founding product works” when a new user can photograph the ingredients they currently have, receive a credible restaurant-style dish that fits their chosen cuisine and dietary constraints, understand exactly which ingredients they already possess and which they still need, and follow the resulting instructions to cook the meal successfully.**
+
+A successful founding experience should make the user feel:
+
+> **“I had these ingredients, I wanted this kind of food, and now I know what I can cook without having to start from scratch.”**
+
+The strongest proof is not the number of restaurants indexed, AI generations produced, or recipes stored.
+
+It is the successful completion of the **fridge → suitable dish → minimal shopping → cooked meal** loop.
+
+## 16. Open Product Questions
+
+Only the following questions materially affect the product definition:
+
+1. **Is the product fundamentally about recreating specific restaurant menu items, or about discovering restaurant-style dishes inspired by restaurant menus?**
+   The latter is more defensible if exact restaurant recipes and ingredient data are unavailable.
+
+2. **How important is geographic restaurant discovery to the core experience?**
+   If users mainly want a style of food rather than a nearby restaurant's dish, location can become supporting context rather than a primary input.
+
+3. **What is the minimum acceptable menu-data coverage for the restaurant concept to be useful?**
+   If external menu coverage is insufficient, the product needs a stronger non-menu fallback.
+
+4. **Should the primary ranking optimise for maximum ingredient usage, minimum additional shopping, dish popularity, restaurant relevance, or a combination?**
+   This directly defines what “best match” means.
+
+5. **How much recipe invention is acceptable?**
+   The product needs a clear boundary between a sourced restaurant dish, an inferred recreation, and a fully generated recipe.
+
+6. **Is the primary value proposition avoiding the shop, reducing the size of the shopping trip, or simply deciding what to cook from what is already available?**
+   These are related but produce different optimisation priorities.
+
+7. **How much user correction is acceptable after fridge recognition?**
+   This determines whether image recognition is a convenience feature or a central dependency of the product experience.
+
+8. **What constitutes a trustworthy dietary match?**
+   The product needs to establish how much confidence is required before presenting a dish as compatible with a dietary restriction.
+
+### Founding Truth
+
+The simplest expression of the product is:
+
+**See what I have → understand what I want → find a restaurant-style dish I can realistically make → tell me what I'm missing → help me cook it.**
+
+That is the product. Restaurant discovery, AI, menu APIs, grocery data, media, saved recipes, and future social or commercial features exist to support that transformation rather than define it.
