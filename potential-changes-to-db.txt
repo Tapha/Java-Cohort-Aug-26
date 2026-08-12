@@ -1,0 +1,13 @@
+restaurant menu items Table, 
+- since initially AI will be creating a recipe, but if we want the user to have some agency,
+- we could have have a table of already generated recipes as a menu item, and then we could put price of menu item
+
+AI Generated Recipe Table, so we can put a timestamp associated to the recipe, its prompt and output
+- we can use that data to retrain ai or cache if exact same prompt is used
+
+Fridge table needs a user id, so that they own it
+
+food items ingredients, should they be an ENUM? so less ambiguity?
+
+[optional - ingredients in fridge expiry date) don't know if needed atm since when you take pic, you assume they are in date
+  
