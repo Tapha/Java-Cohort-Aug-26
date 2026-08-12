@@ -1,1 +1,392 @@
+You are acting as a senior product architect.
+Your task is to transform the supplied product brainstorm, user journeys, and existing DBML into a Founding Spec.
+A Founding Spec is the irreducible product truth. It sits above implementation details.
+It should answer:
+What are we actually making?
+Who is it for?
+What problem does it solve?
+What is the primary transformation for the user?
+What is the smallest complete user loop?
+What capabilities must exist for that loop to work?
+What information does the system fundamentally need to understand?
+What external systems or sources does the product depend upon?
+What assumptions are currently being made?
+What is explicitly outside the first version?
+Important reasoning rules
+Treat the supplied material as evidence, not specification truth.
+The brainstorm may contain:
+duplicate concepts
+premature implementation choices
+speculative APIs
+future features
+database modelling decisions
+contradictory user journeys
+terminology that has not stabilised
+Resolve these into the simplest coherent product model.
+The existing DBML represents the team's current base assumptions. Do not redesign the database in this document.
+Instead:
+infer the product concepts represented by the schema;
+identify where the schema supports the intended product;
+identify important product concepts that appear in the journey but are not yet represented clearly;
+identify schema assumptions that may need validating later;
+avoid turning the Founding Spec into a database review.
+Do not descend into:
+Java classes
+controllers
+repositories
+ORM mappings
+endpoints
+SQL
+tickets
+detailed infrastructure
+implementation sequencing
+Those belong to later stages of Spec Descent.
+Determine the product invariant
+Find the simplest statement of what the system does.
+The core concept appears to involve:
+using ingredients detected from a user's fridge to identify restaurant-style dishes that they can realistically recreate, then guiding them from available ingredients to a cooked meal.
+Validate or refine this interpretation from the supplied material.
+Separate:
+Core invariant
+What must remain true regardless of implementation.
+Primary loop
+The shortest journey demonstrating the product's value.
+Supporting capabilities
+Things required to make that loop possible.
+Secondary capabilities
+Useful but non-essential behaviours.
+Future possibilities
+Ideas that should not distort the first version.
+AI boundary
+Explicitly describe what AI is responsible for.
+Distinguish between:
+deterministic application data;
+externally retrieved data;
+AI-derived data;
+user-provided data.
+For AI operations, describe the required input and structured output contract conceptually, without choosing implementation technologies.
+Pay particular attention to:
+fridge image → ingredient recognition;
+ingredient list + cuisine/preferences → candidate dishes;
+restaurant/menu information → restaurant-style recipe association;
+ingredient compatibility scoring;
+recipe generation or adaptation.
+Do not silently assume that AI-generated information and authoritative restaurant/menu information are equivalent.
+Call out uncertainty where necessary.
+External dependency boundary
+Identify concepts that may depend upon external providers, such as:
+location
+restaurant discovery
+restaurant menus
+grocery/store information
+nutritional information
+media/CDN services
+Describe what capability is required, rather than locking the product to Google Places, MenusAPI, or another vendor unless the vendor itself is fundamental.
+Required output
+Produce the Founding Spec using this structure:
+Founding Spec
+1. Product Definition
+One concise paragraph describing what the product is.
+2. Problem / Wedge
+Describe the specific user problem being attacked first.
+3. Target User
+Describe the initial user and their situation.
+4. Core Product Invariant
+Give the single statement that should remain true through future architectural changes.
+5. Primary User Loop
+Write the minimum complete journey from opening the application to achieving value.
+Prefer approximately 5–8 steps.
+6. Product Inputs
+Identify the fundamental information entering the system.
+7. Product Outputs
+Identify what the system must return to the user.
+8. Core Domain Concepts
+Identify the major nouns in the product and explain why each exists.
+Use the existing DBML as evidence.
+Do not simply reproduce its tables.
+9. AI Responsibilities
+Define what AI determines, transforms, recommends, extracts, or generates.
+10. Non-AI Responsibilities
+Define what must remain deterministic application behaviour or authoritative stored/external data.
+11. External Capabilities
+Describe required external capabilities without prematurely choosing vendors.
+12. First-Version Scope
+State what must exist for the first convincing end-to-end product.
+13. Explicit Non-Goals
+Move social features, ratings, payments, sponsorship, advanced recommendation systems, and other speculative features here unless they are required for the primary loop.
+14. Assumptions Requiring Validation
+Identify unresolved assumptions such as menu availability, restaurant-to-recipe mapping, ingredient recognition quality, location coverage, substitutions, pricing accuracy, and data ownership.
+15. Success Condition
+Describe exactly what must happen for us to say:
+“The founding product works.”
+16. Open Product Questions
+Include only questions that materially alter the product definition or primary loop.
+Do not include implementation trivia.
 
+Source Material
+
+User opens app
+pick cuisine you want to have / dietary requirements(in settings instead?)
+take picture of fridge - extract ingredients as an list - (add additional things to the list)
+[backend] using the list of ingredients, Ask AI which recipes fit based on selected cuisine 
+
+AI - Input (cuisine + current ingredients list ) + Output must be the same, it needs to be structured, so that it is coherent for out system architecture
+
+AI returns recipes and (popular)restaurant it fits with
+
+build shopping cart (for grocery store visit)
+user is shown a recipe
+
+
+Existing Base Schema
+
+Enum CuisineType {
+  Italian
+  Indian
+  Chinese
+  Japanese
+  Mexican
+  American
+  French
+  Other
+}
+
+Enum MeasurementUnit {
+  gram
+  kilogram
+  millilitre
+  litre
+  tsp
+  tbsp
+  cup
+  piece
+}
+
+Enum DietaryChoice {
+  Vegan
+  Vegetarian
+  Pescatarian
+  Halal
+  Kosher
+  GlutenFree
+  DairyFree
+}
+
+Table Restaurant {
+  id int [pk, increment]
+  restaurant_name varchar(255)
+  longitude varchar(50)
+  latitude varchar(50)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table RestaurantCuisine {
+  id int [pk, increment]
+  restaurant_id int [ref: > Restaurant.id]
+  cuisine CuisineType
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Recipe {
+  id int [pk, increment]
+  restaurant_id int [ref: > Restaurant.id]
+
+  recipe_name varchar(255)
+  description longtext
+  recipe_originator varchar(255)
+  avg_restaurant_price decimal(10,2)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table RecipeMetadata {
+  id int [pk, increment]
+  recipe_id int [ref: > Recipe.id]
+
+  metadata_name varchar(100)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table RecipeItem {
+  id int [pk, increment]
+  recipe_id int [ref: > Recipe.id]
+
+  menu_item_name varchar(255)
+  cost decimal(10,2)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table RecipeFoodItems {
+  id int [pk, increment]
+
+  recipe_id int [ref: > Recipe.id]
+  food_item_id int [ref: > FoodItems.id]
+
+  measurement_unit MeasurementUnit
+  measurement_quantity int
+  measurement_text varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Images {
+  id int [pk, increment]
+  url varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table FoodItems {
+  id int [pk, increment]
+
+  image_id int [ref: > Images.id]
+  fridge_id int [ref: > Fridge.id]
+
+  ingredient_name varchar(255)
+  available boolean
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table GroceryStore {
+  id int [pk, increment]
+
+  store_name varchar(255)
+  longitude varchar(50)
+  latitude varchar(50)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table GroceryStoreInventory {
+  id int [pk, increment]
+
+  grocery_store_id int [ref: > GroceryStore.id]
+  food_item_id int [ref: > FoodItems.id]
+
+  price decimal(10,2)
+
+  measurement_unit MeasurementUnit
+  measurement_quantity int
+  measurement_text varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Users {
+  id int [pk, increment]
+
+  name varchar(255)
+  longitude varchar(50)
+  latitude varchar(50)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Fridge {
+  id int [pk, increment]
+
+  user_id int [ref: > Users.id]
+  fridge_name varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table PreparationSteps {
+  id int [pk, increment]
+
+  recipe_id int [ref: > Recipe.id]
+  recipe_step varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table PreparationStepsProgress {
+  id int [pk, increment]
+
+  preparation_step_id int [ref: > PreparationSteps.id]
+
+  total_steps int
+  current_step int
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table SavedRecipes {
+  id int [pk, increment]
+
+  recipe_id int [ref: > Recipe.id]
+  user_id int [ref: > Users.id]
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table DietaryPreferences {
+  id int [pk, increment]
+
+  user_id int [ref: > Users.id]
+  dietary_choice DietaryChoice
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table Video {
+  id int [pk, increment]
+
+  url varchar(255)
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table AIGeneratedRecipe {
+  id int [pk, increment]
+
+  recipe_id int [ref: > Recipe.id]
+  
+  ai_prompt longtext
+  ai_output longtext
+
+  generated_at timestamp
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
