@@ -233,3 +233,18 @@ Table Video {
   updated_at timestamp
   deleted_at timestamp
 }
+
+Table AIGeneratedRecipe {
+  id int [pk, increment]
+
+  recipe_id int [ref: > Recipe.id]
+  
+  ai_prompt longtext
+  ai_output longtext
+
+  generated_at timestamp
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
