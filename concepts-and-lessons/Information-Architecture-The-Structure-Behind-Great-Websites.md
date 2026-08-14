@@ -46,8 +46,6 @@ Begin with the big picture:
 
 Only after establishing this structure should you descend into individual pages, layouts and components.
 
-This is the approach that [@PlanFlowDev](https://twitter.com/PlanFlowDev) helps you take: **structure first, details second.**
-
 ---
 
 ## Principle 3: Understand the User’s Goal
