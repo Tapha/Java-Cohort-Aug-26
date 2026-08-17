@@ -66,3 +66,14 @@ HomePage
 │   └── RestaurantList
 │       └── RestaurantCard
 └── BottomNavigation
+
+---
+
+## Definition of Done
+
+- Homepage is implemented and accessible as the primary landing page.
+- All required homepage sections are displayed using reusable components.
+- Mock data is used where backend functionality is not yet available.
+- Core interactions and navigation work as expected.
+- The homepage is responsive across supported screen sizes.
+- The implementation is ready for integration with future backend functionality.
