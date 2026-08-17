@@ -1,3 +1,6 @@
+TICKET:
+
+
 Cooked Homepage — Initial Vertical Slice
 User Story: As a Cooked user, I want a simple homepage with useful lists so I can quickly find something to cook.
 
