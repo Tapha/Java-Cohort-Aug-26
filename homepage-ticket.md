@@ -1,64 +1,68 @@
-# Homepage UI
+# Create Frontend Homepage
 
+## 1. Motivation & Business Impact
 
-## Description
+The homepage is the main entry point into Cooked. It should make it easy for users to discover relevant food, return to recipes they have interacted with, and navigate the app.
 
-### What needs to change?
+We believe a simple, content-led homepage will reduce the effort required to decide what to cook.
 
-Build the homepage as the main entry point for discovering restaurant-style meals users can make with their available ingredients.
+Success means users can quickly find a relevant recipe or dish without unnecessary navigation.
+
+---
+
+## 2. User Story
+
+**As a Cooked user,**  
+I want to see relevant recipes and food content when I open the app,  
+**so that** I can quickly decide what to cook or explore.
+
+### High-Level Acceptance Criteria
+
+- Users can search from the homepage.
+- Users can discover recipes and restaurants.
+- Users can access previously viewed or saved recipes.
+- Users can see personalised recommendations.
+- Users can navigate to other areas of the app.
+
+---
+
+## 3. User Interaction / Design
 
 The homepage should include:
-- Search
-- Featured recipes
-- Recently viewed / saved recipes
-- Personalised recommendations
-- Popular restaurant dishes
-- Bottom navigation
 
-Homepage lists should be modular so they can use different data sources, filters, and ranking rules.
+- **Search** — at the top of the page.
+- **Featured Recipes** — curated recipe selection.
+- **Recently Viewed / Saved** — relevant user content.
+- **For You** — personalised recipe recommendations.
+- **Popular Restaurants** — popular restaurant/dish content.
+- **Bottom Navigation** — persistent navigation with the current section highlighted.
 
-### Why does it matter?
+The experience should be simple, easy to scan, and require minimal decision-making.
 
-The homepage should quickly answer:
+### Dietary Requirements
 
-> "What can I make with what I have?"
+During initial sign-up/setup, users should have a one-time opportunity to select dietary requirements. These preferences should be saved and made available for future personalisation.
 
-It should reduce decision-making and surface relevant dishes based on ingredients, cuisine, dietary requirements, and user behaviour.
+---
 
-## UI Requirements
+## 4. Functional Requirements
 
-- **Search:** Search icon at the top of the page.
-- **Featured:** Small selection of featured recipes.
-- **Recently Viewed / Saved:** Show relevant dishes the user has viewed or saved.
-- **For You:** Personalised recipe recommendations.
-- **Popular:** Popular restaurant/menu-inspired dishes. Only show restaurant information when reliable data exists.
-- **Bottom Navigation:** Fixed navigation with the current section highlighted.
-- **Modular Lists:** Reusable list component supporting different data sources, filters, ranking, and item limits.
+- Build the homepage in React.
+- Use reusable components for recipe and restaurant collections.
+- The same components should support different datasets, e.g. Featured, Saved, Recently Viewed and Personalised.
+- Use mock/seeded data where backend functionality is unavailable.
+- Keep presentation components separate from recommendation/ranking logic.
+- Ensure the homepage is responsive.
 
-## Interactive States
+Example:
 
-- Cards and buttons have default, hover, focus, and pressed states.
-- Search opens when selected and can be closed.
-- Bottom navigation updates the active state when selected.
-- Empty sections are hidden or show an appropriate empty state.
-
-## Accessibility
-
-- All interactive elements are keyboard accessible.
-- Icon-only controls have ARIA labels.
-- Visible focus states are provided.
-- Images have appropriate alt text.
-- Colour is not the only way to communicate state.
-
-## Acceptance Criteria
-
-- [ ] Homepage displays all required sections.
-- [ ] Search is accessible from the top of the homepage.
-- [ ] Users can open recipes from homepage cards.
-- [ ] Recently viewed and saved content only appears when relevant.
-- [ ] Personalised and popular lists can be populated independently.
-- [ ] Homepage lists use a reusable/modular component.
-- [ ] Lists support different data sources and constraints.
-- [ ] Bottom navigation remains visible and shows the active section.
-- [ ] Empty or unavailable sections do not break the homepage.
-- [ ] Interactive elements meet accessibility requirements.
+```text
+HomePage
+├── Search
+├── ContentSection
+│   └── RecipeList
+│       └── RecipeCard
+├── ContentSection
+│   └── RestaurantList
+│       └── RestaurantCard
+└── BottomNavigation
