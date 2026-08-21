@@ -48,11 +48,11 @@ class User {
 
 ## Questions
 
-1. Which parts of this code are likely stored on the **stack**?
-2. Which object is created on the **heap**?
-3. What does the variable `user` refer to?
-4. When `main()` finishes, what can eventually happen to the `User` object?
-5. In your own words, explain this line:
+1. Which parts of this code are likely stored on the **stack**? Memory address locations for args, user, email and name. As well as main().
+2. Which object is created on the **heap**? The object User, created by 'new'.
+3. What does the variable `user` refer to? Points to the actual address of the memory location for 'User'.
+4. When `main()` finishes, what can eventually happen to the `User` object? Can become eventually eligible for garbage collection if no longer in use.
+5. In your own words, explain this line: Objects define the shape within the memory allocation, so when declaring an object we declare its shape and store a reference pointer to the actual location within the memory of this object.
 
 ```text
 An object is structured memory.
@@ -94,13 +94,13 @@ public class UserService {
 
 ## Questions
 
-1. What is this class responsible for?
-2. How many different reasons could this class change?
-3. Which method relates to validation?
-4. Which method relates to persistence/database work?
-5. Which method relates to email?
-6. Which method relates to reporting?
-7. Why could this class become difficult to maintain as the system grows?
+1. What is this class responsible for? User registration for an email sub of some sort.
+2. How many different reasons could this class change? 4 different ways via each method.
+3. Which method relates to validation? ValidateEmail()
+4. Which method relates to persistence/database work? saveUser()
+5. Which method relates to email? sendWelcomeEmail()
+6. Which method relates to reporting? generateUserReport()
+7. Why could this class become difficult to maintain as the system grows? Has 4 dependencies which breaks the single responsibility principle in SOLID, this damages maintainability as you gain traits such as coupling.
 
 ---
 
@@ -122,23 +122,23 @@ Just create the class names and method names.
 
 ```java
 public class UserRegistrationService {
-
+    public void RegisterUser(String email, String name)
 }
 
 public class EmailValidator {
-
+    public void ValidateEmail(String email)
 }
 
 public class UserRepository {
-
+    public void saveUser(String email, String name)
 }
 
 public class WelcomeEmailSender {
-
+    public void SendWelcome(String email)
 }
 
 public class UserReportService {
-
+    public void GenerateReport(String email)
 }
 ```
 
@@ -200,10 +200,10 @@ public class SmsSender implements MessageSender {
 
 ## Questions
 
-1. What capability does `MessageSender` represent?
-2. Why is `MessageSender` more flexible than depending directly on `EmailSender`?
-3. Which SOLID principle does this help with?
-4. How does this make the system easier to extend later?
+1. What capability does `MessageSender` represent? Stores the contact details.
+2. Why is `MessageSender` more flexible than depending directly on `EmailSender`? 'to' can be altered to be say a phone number OR email, its a more abstract method.
+3. Which SOLID principle does this help with? Dependency inversion principle as modules now depend on abstractions.
+4. How does this make the system easier to extend later? Because it's abstract you could add further features to this interface without having to remove or alter any of the proceeding features as they are already very abstract.
 
 ---
 
@@ -239,22 +239,23 @@ public class UserRegistrationService {
     private final MessageSender messageSender;
 
     public UserRegistrationService(MessageSender messageSender) {
-        // your code here
+        this.messageSender = messageSender;
     }
 
     public void register(String email, String name) {
-        // your code here
+        System.out.println("User registering");
+        messageSender.send(email, "Welcome, " + name);
     }
 }
 ```
 
 ## Questions
 
-1. What changed in the design?
-2. What concrete class did we remove from `UserRegistrationService`?
-3. What abstraction does it now depend on?
-4. Which principle is this?
-5. Why is this better?
+1. What changed in the design? Using a more abstracted variable messageSender as opposed to a more specific dependent such as emailSender.
+2. What concrete class did we remove from `UserRegistrationService`? EmailSender
+3. What abstraction does it now depend on? messageSender
+4. Which principle is this? Dependency inversion principle
+5. Why is this better? Means features can be added without having to edit and change older lower level features and risk causing errors down the line.
 
 ---
 
@@ -278,11 +279,11 @@ class Penguin extends Bird {
 
 ## Questions
 
-1. Why does this design feel logical at first?
-2. Why does it become a problem in code?
-3. What promise does `Bird` appear to make?
-4. How does `Penguin` break that promise?
-5. Which SOLID principle is involved here?
+1. Why does this design feel logical at first? It removes the issue specific to penguins but the parent class would otherwise still work for other birds.
+2. Why does it become a problem in code? Violates the Liskov substitution principle, so the penguin subclass should be replaceable with the bird parent class without breaking anything but of course it causes an error as penguins violate the method within the parent class.
+3. What promise does `Bird` appear to make? Anything that is a bird will inherit the ability to fly.
+4. How does `Penguin` break that promise? penguins are famously flightless.
+5. Which SOLID principle is involved here? Liskov Substitution principle
 
 ## Better Design
 
@@ -298,7 +299,10 @@ interface FlyingBird {
 }
 
 class Eagle implements Bird, FlyingBird {
-
+    @Override
+    public void fly() {
+        System.out.println("Eagle flies");
+    }
 }
 
 class Penguin implements Bird {
@@ -308,7 +312,7 @@ class Penguin implements Bird {
 
 ## Final Question
 
-Explain this sentence:
+Explain this sentence: When a subclass inherits a method or "trait" from it's parent class, this shouldn't in any way violate any property inherent to the subclass, i.e. a dog is an animal, it shouldn't therefore inherit a method such as makes sound "moo" for example.
 
 ```text
 Inheritance should preserve truth.
@@ -343,11 +347,11 @@ public class UserRegistrationService {
 
 ## Questions
 
-1. Which objects does `UserRegistrationService` use?
-2. Is this inheritance or composition?
-3. Why is this better than putting all logic inside one class?
-4. What does composition allow us to do?
-5. Explain this sentence:
+1. Which objects does `UserRegistrationService` use? EmailValidator, UserRepository, MessageSender
+2. Is this inheritance or composition? Composition
+3. Why is this better than putting all logic inside one class? Less coupling, easier to test etc. Related to the SRP and DIP. 
+4. What does composition allow us to do? Independent testing and easier implementation of changes to code.
+5. Explain this sentence: We can decompose larger classes into smaller classes responsible for single methods that makes their individual functions easier to understand and test as it becomes easier to see where our program breaks down.
 
 ```text
 Composition lets us build bigger systems from smaller, clearer pieces.
@@ -359,11 +363,11 @@ Composition lets us build bigger systems from smaller, clearer pieces.
 
 Answer these in your own words.
 
-1. What is the relationship between memory and objects?
-2. What is the relationship between objects and dependencies?
-3. Why do dependencies make software harder to change?
-4. What does SOLID help us control?
-5. What does this sentence mean?
+1. What is the relationship between memory and objects? Objects are the structure of data in the memory in which we manipulate and define when writing code. Objects are an instance of a class where a class is what defines this shape.
+2. What is the relationship between objects and dependencies? Dependencies are simply the relationship between objects where one object may require another to complete its purpose.
+3. Why do dependencies make software harder to change? If you change object A and object B depends on A then you end up effecting both objects rather than just the one.
+4. What does SOLID help us control? Scalability, maintainability and how our code will perform and change with time. We use SOLID to prevent software entropy.
+5. What does this sentence mean? When writing code to produce software we are simply just manipulating memory to store that data we write into it. Objects are instances of class' in which define the shape of the data in memory, the objects correspond to the actual structure of this data. SOLID prevents the unwanted change and degrading of this shape over time as things naturally change. 
 
 ```text
 Memory is where software lives.
@@ -386,13 +390,79 @@ Your system should include:
 * `OrderRepository`
 * `ReceiptSender`
 
+```java
+
+public interface PaymentProcessor{
+    void processPayment(double amount);
+}
+
+public class StripePaymentProcessor implements PaymentProcessor{
+    @Override           //used as a safety net to ensure syntax is correct fyi
+    public void processPayment(double amount) {
+        System.out.println("Payment processing:" + amount);
+    }
+}
+
+public class PaypalPaymentProcessor implements PaymentProcessor{
+    @Override
+    public void processPayment(double amount){
+        System.out.println("Payment processing:" + amount);
+    }
+}
+
+public class OrderRepository {
+
+    public void saveOrder(String orderId) {
+        System.out.println("Saving order: " + orderId);
+    }
+}
+
+public class ReceiptSender {
+
+    public void sendReceipt(String email) {
+        System.out.println("Receipt sent to: " + email);
+    }
+}
+
+public class CheckoutService {
+
+    private final PaymentProcessor paymentProcessor; //prevents other classes from accessing this variable and final means that once the variable is assigned, it can no longer be reassigned. i.e. when we take a payment processor, this can't be changed.  
+    private final OrderRepository orderRepository;
+    private final ReceiptSender receiptSender;
+
+    public CheckoutService(
+            PaymentProcessor paymentProcessor,
+            OrderRepository orderRepository,
+            ReceiptSender receiptSender
+    ) {
+        this.paymentProcessor = paymentProcessor; //take the input object and assign it to this object.
+        this.orderRepository = orderRepository;
+        this.receiptSender = receiptSender;
+    }
+
+    public void checkout(String orderId, double amount, String email) {
+
+        paymentProcessor.processPayment(amount);
+
+        orderRepository.saveOrder(orderId);
+
+        receiptSender.sendReceipt(email);
+
+        System.out.println("Checkout complete");
+    }
+}
+
+
+
+```
+
 Then answer:
 
-1. Which classes represent responsibilities?
-2. Which interface represents a capability?
-3. Where are you using composition?
-4. Where are you applying DIP?
-5. How could you add `ApplePayPaymentProcessor` without changing `CheckoutService`?
+1. Which classes represent responsibilities? PaymentProcessor, OrderRepository and ReceiptSender
+2. Which interface represents a capability? PaymentProcessor as it means that checkoutService doesn't have to care about the specific paymentProcessor to work.
+3. Where are you using composition? CheckoutService as it calls other objects to complete its function.
+4. Where are you applying DIP? PaymentProcessor parent class implementation for the payment method subclasses.
+5. How could you add `ApplePayPaymentProcessor` without changing `CheckoutService`? Simply implement another class of the name ApplePaymentProcessor in the same way we did for stripe and paypal.
 
 ---
 
