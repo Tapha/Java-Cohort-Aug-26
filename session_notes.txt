@@ -1,0 +1,17 @@
+smallest executable unit.
+ 
+when trying to debug an issue within a complex interdependant system, what is the stable attactor that you are seeking?
+ 
+what does TDD actually achieve?
+ 
+What does dependency injection accomplish?
+ 
+Is it cool if I turn on meeting recording, my internets dropping out a lot at the minute
+ 
+What is Docker, and what is the problem that Docker containers solve?
+ 
+Manage dependencies with Dependabot - GOV.UK Developer Documentation
+https://docs.publishing.service.gov.uk/manual/manage-dependencies.html
+ 
+If we assume that a codebase is simply a network. What would the nodes be within the Cooked project, within the relevant areas?
+ 
